@@ -13,6 +13,7 @@ export const coffeeTimeLocation = dataSheetName + "!B1";
 export const currentConnectionsLocation = dataSheetName + "!B2";
 
 const getAuthFromEnv = () => {
+    console.log(process.env);
     const credentials = process.env.google;
     if (!credentials) {
         console.log("Google env not set!");
