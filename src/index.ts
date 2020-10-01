@@ -1,5 +1,6 @@
 import * as cors from "cors";
 import * as socketio from "socket.io";
+import {retrieveValue, updateValue, coffeeTimeLocation, sheetId, currentConnectionsLocation} from "./google";
 const app = require("express")();
 const http = require("http").createServer(app);
 const port = 3000;
@@ -17,20 +18,26 @@ const io = socketio(http, {
   }
 });
 
+const updateConnections = async () => {
+  await updateValue(sheetId, currentConnectionsLocation, [[Object.keys(io.sockets.sockets).length.toString()]]);
+}
+
+updateConnections();
 console.log("Server started!");
 
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Hello hacker!");
+  res.send("Hello hacker (tim?)!");
 });
 
-app.get("//koffieknop", (req, res) => {
-  res.send("Koffie time updated");
-  io.emit("refresh");
+app.get("/koffieknop", async (req, res) => {
+  const current_coffeetime = await retrieveValue("1A8DtGaMWRQLwMGbuuk_6u7FQRAa_KZ70nKfFkA1MiBo", coffeeTimeLocation);
+  res.send(`De laatste keer dat iemand die knop indrukte: ${new Date(current_coffeetime.data.values[0][0]).toTimeString()}`);
 });
 
-app.post("//koffieknop", (req, res) => {
+app.post("/koffieknop", async (req, res) => {
+  await updateValue(sheetId, coffeeTimeLocation, [[new Date()]])
   res.send("Koffie time updated");
   io.emit("refresh");
 });
@@ -39,8 +46,13 @@ io.origins((origin, callback) => {
   callback(null, true);
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
+  await updateConnections();
   console.log("someone connected");
+});
+
+io.on("disconnect", async () => {
+  await updateConnections();
 });
 
 http.listen(port, () => {
