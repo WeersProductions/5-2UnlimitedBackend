@@ -13,10 +13,15 @@ export const coffeeTimeLocation = dataSheetName + "!B1";
 export const currentConnectionsLocation = dataSheetName + "!B2";
 
 const getAuthFromEnv = () => {
-    console.log(process.env);
-    const credentials = process.env.google;
+    const credentials = process.env.NAME;
+    // console.log(`name: ${process.env.GOOGLE}`);
     if (!credentials) {
         console.log("Google env not set!");
+        console.log("--Found the following env variables--")
+        var env = process.env;
+        Object.keys(env).forEach(function(key) {
+            console.log(`${key}="${env[key]}"`);
+        });
         return false;
     }
 

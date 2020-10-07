@@ -21,9 +21,9 @@ const io = socketio(http, {
 const updateConnections = async () => {
   await updateValue(sheetId, currentConnectionsLocation, [[Object.keys(io.sockets.sockets).length.toString()]]);
 }
+console.log("Server started!");
 
 updateConnections();
-console.log("Server started!");
 
 app.use(cors());
 
